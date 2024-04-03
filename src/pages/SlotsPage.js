@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { List } from 'antd';
 import { useParams } from 'react-router-dom';
+import dayjs from 'dayjs';
 
 const SlotsPage = () => {
   const { coachId, date } = useParams();
@@ -10,6 +11,7 @@ const SlotsPage = () => {
     queryKey: ['coaches'],
     queryFn: async () => {
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      // const timezone = "Europe/Paris"
       const response = await fetch(`/api/v1/coaches/${coachId}/slots?date=${date}&timezone=${timezone}`, {
         headers: {
           'Accept': 'application/json'
@@ -45,7 +47,7 @@ const SlotsPage = () => {
       dataSource={data.records}
       renderItem={(slot) => (
         <List.Item>
-          {slot.reserved ? 'Reserved' : 'Available'} ({new Date(slot.available_at).toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' })} - {new Date(slot.available_until).toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' })})
+          {slot.reserved ? 'Reserved' : 'Available'} ({dayjs(slot.available_at).format('HH:mm')} - {dayjs(slot.available_until).format('HH:mm')})
 
           {!slot.reserved && <button data-slot-id={slot.id} onClick={onReserveClick}>Reserve</button>}
         </List.Item>
